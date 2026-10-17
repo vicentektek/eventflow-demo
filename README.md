@@ -47,6 +47,16 @@ Open `http://localhost:8080/`.
 
 In your repository, open **Settings → Pages** and select **Deploy from a branch**, branch `main`, folder `/ (root)`. GitHub Pages can publish the site without a build step.
 
+## Quality checks
+
+A reproducible offline smoke-test suite is included. It exercises all eight screens, event filtering, sample event and crew creation, simulated assignments and payments, month navigation, CSV/JSON exports and demo reset.
+
+```bash
+node --test tests/smoke.test.cjs
+```
+
+The suite uses Node.js built-ins and needs no dependencies or production credentials. It is not a substitute for manual cross-browser visual testing before a portfolio presentation.
+
 ## Security boundaries
 
 - No Turso database, production API, authentication service or real payroll integration
