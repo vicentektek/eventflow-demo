@@ -4,3 +4,13 @@
 @media(max-width:1280px){.content{padding:0 24px 34px}.metric-grid{gap:10px}.metric-value{font-size:23px}.events-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-stat{min-width:175px}.dashboard-grid{grid-template-columns:1fr 360px}}
 @media(max-width:1020px){.sidebar{width:77px;padding:23px 10px}.logo{padding:5px 7px 25px}.logo-word,.logo-sub,.side-section,.nav-link span,.sidebar-end,.credit{display:none}.nav-link{justify-content:center;padding:12px 10px}.nav-link svg{width:20px;height:20px}.dashboard-grid,.two-col-bottom,.analytics{grid-template-columns:1fr}.hero-stat{display:none}.content{padding:0 25px 30px}}
 @media(max-width:700px){.shell{display:block}.sidebar{display:none}.mobile-header{display:flex;position:sticky;top:0;z-index:10;background:#111827eF;backdrop-filter:blur(12px);padding:12px 15px;border-bottom:1px solid #2d3545;gap:10px;align-items:center;overflow-x:auto}.mobile-title{font-size:16px;font-weight:850;margin-right:5px;white-space:nowrap}.mobile-nav{display:flex;gap:6px}.mobile-nav button{border:1px solid #334057;background:#202a3c;border-radius:8px;color:#b9c6d9;padding:7px 9px;font-size:11px;white-space:nowrap}.mobile-nav button.active{color:#ffc1ba;border-color:#f67d7d}.content{padding:0 14px 25px}.topbar{height:66px;margin-bottom:20px}.topright{gap:8px}.clock{display:none}.view-header{align-items:start;flex-direction:column}.view-header h1{font-size:27px}.hero{padding:22px}.hero h2{font-size:23px}.metric-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{padding:14px;min-height:119px}.metric-value{font-size:21px}.events-grid{grid-template-columns:1fr}.card{padding:15px}.cal-grid{gap:3px}.cal-day{min-height:77px;padding:5px;border-radius:6px}.cal-weekday{font-size:9px}.cal-num{font-size:10px}.cal-event{font-size:9px;padding:3px;white-space:normal;line-height:1.15}.privacy-grid{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}.toast-area{left:15px;right:15px}.ring-row{gap:12px}.ring{width:130px;height:130px}.ring svg{width:130px;height:130px}}
+
+
+/* All inline icons are explicitly sized. Unbounded SVGs previously expanded and obscured views. */
+svg{display:inline-block;width:18px;height:18px;max-width:100%;vertical-align:middle;flex-shrink:0}
+.subtle-note{display:flex;align-items:flex-start;gap:10px}
+.subtle-note>svg{width:17px;height:17px;flex:0 0 17px;margin-top:1px}
+.hero .overline>svg,.preview-meta>svg,.tiny-link>svg,.mini>svg{width:15px;height:15px}
+.privacy-tile>svg{display:block}
+.logo-mark svg,.event-symbol svg,.metric-icon svg{display:block}
+.event-preview .preview-meta{line-height:1.5}
