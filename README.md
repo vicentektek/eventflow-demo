@@ -1,44 +1,69 @@
-# EventFlow — Safe Interactive Portfolio Demo
+# EventFlow Studio
 
-An isolated, browser-only demonstration of event and workforce management workflows, inspired by a separate private production application.
+### A production control center — built as an interactive, privacy-safe portfolio demo.
 
-**Live demo:** Deployment pending (Vercel or GitHub Pages).  
-**Code status:** Functional prototype.  
-**Data:** All names, venues, events and monetary amounts are fictional.
+[**Open the live demonstration**](https://vicentektek.github.io/eventflow-demo/) · [**Developer profile**](https://github.com/vicentektek) · [**Devpost portfolio**](https://devpost.com/Vicentekk)
 
-## Features
-- Event dashboard and calendar
-- Create/edit/remove example events
-- Create/edit fictional staff members
-- Assign people to events with roles, hours and hourly rates
-- Calculate sample compensation and register simulated partial payments
-- Local activity log
-- Reset the demo to its original data
+> **Public demo environment.** Every production, crew member, venue, amount and transaction in this project is fictional. No company backend, production database, employee records or secrets are connected.
 
-## Privacy and security
+## Explore the product
 
-This public repository is **not the company's private application** and does not contain its source code, production database, employee records or credentials.
+| Section | Interactive capabilities |
+| --- | --- |
+| Overview | Operational dashboard, financial KPIs, upcoming shows, live roster and charts |
+| Events | Create, edit, delete, filter and search sample productions |
+| Crew & staff | Add and edit sample crew members and their availability |
+| Assignments | Assign technicians, calculate estimated fees and simulate partial payments |
+| Show calendar | Browse any month and schedule a fictional production by clicking a day |
+| Analytics | Estimated project value, labor cost comparisons, settlement progress and CSV export |
+| Activity log | Review your browser-local demo changes and export a JSON snapshot |
+| Demo & privacy | Understand exactly what the public demonstration does and does not connect to |
 
-The demo has no backend, API endpoints, database connection, authentication or payment integrations. It does not access the company's Turso database or Vercel environment variables. Data changes are stored only in the visitor's browser through localStorage. The included Vercel configuration blocks network connections through a Content Security Policy.
+The interface is responsive and requires **no signup**, database or API key.
 
-**Do not enter real employee details or use this as a payroll system.**
+## Architecture
 
-## Run locally
+The demonstration intentionally uses **vanilla JavaScript, HTML and CSS**, optimized for GitHub Pages. It runs entirely in the visitor's browser.
 
-Open `index.html` in your browser. Alternatively, serve the folder with:
+- `index.html` — application entry point and startup fallback
+- `studio.css` — responsive dark design system
+- `studio.js` — fictional data, event/crew workflows, calculations, local persistence
+- `favicon.svg` — brand mark
+- `vercel.json` — optional configuration for a separate Vercel deployment
+
+Browser-only changes are stored in `localStorage`. Use **Reset sample data** to start fresh. Data is not shared between visitors.
+
+### Run locally
+
+Clone the repository and serve the root directory with a local web server:
 
 ```bash
 python -m http.server 8080
 ```
 
-Then visit http://localhost:8080.
+Open `http://localhost:8080/`.
 
-## Deploy
+### Deploy with GitHub Pages
 
-Import this repository into Vercel as a new static site. Do not link it to the existing production Vercel project, domain, database or environment variables. No build step or environment variables are required. After deployment, test all workflows in a browser.
+In your repository, open **Settings → Pages** and select **Deploy from a branch**, branch `main`, folder `/ (root)`. GitHub Pages can publish the site without a build step.
 
-## About the developer
+## Security boundaries
 
-Built by [Vicentekk](https://github.com/vicentektek), an award-winning Meta Horizon Worlds creator and live-event technician. The private production application that inspired these workflows was developed using Next.js, React, TypeScript, Prisma and Turso, with AI-assisted programming through GitHub Copilot and Claude. This public demo is a simplified standalone implementation.
+- No Turso database, production API, authentication service or real payroll integration
+- No API requests or external JavaScript libraries
+- No personal employee data, credentials, tokens or production configuration
+- Forms accept only fictional information and store it in browser-local storage
+- Payment actions only update simulated balances; they **cannot transfer money**
+- Public code is separate from the production event management application
 
-[Devpost portfolio](https://devpost.com/Vicentekk) · [LinkedIn](https://www.linkedin.com/in/vicent-andujar-rico-b19b33aa)
+**Important:** The demo is not a payroll application, does not implement server-side authorization, and should not be used to process real employee information.
+
+## Background
+
+This standalone portfolio experience is inspired by an internal event-management application developed for live productions with **Next.js, React, TypeScript, Prisma, Turso and AI-assisted programming tools**. The public version is a separate simulation; it does **not** represent the private system's source code or a live integration with AI services.
+
+Created by [Vicentekk](https://github.com/vicentektek), a Meta Horizon Worlds creator and professional live-event technician based in Valencia, Spain.
+
+---
+
+*Concept and example data are for portfolio demonstration purposes only.*
