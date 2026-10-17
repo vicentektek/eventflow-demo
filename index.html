@@ -1,90 +1,43 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><title>EventFlow | Safe Demo</title><link rel="stylesheet" href="./styles.css?v=3"></head>
-<body><div id="app"><main style="max-width:800px;margin:40px auto;padding:25px;background:white;border-radius:12px"><h1>EventFlow Demo</h1><p>Starting the interactive dashboard...</p></main></div>
-<script>
-try {
-'use strict';
-/* Public, isolated demonstration. No external services, authentication, APIs or production data. */
-const STORAGE='eventflow-portfolio-demo-v1';
-const initial=()=>({
- workers:[{id:1,name:'Alex Rivera',skill:'Audio'},{id:2,name:'Sam Moreno',skill:'Lighting'},{id:3,name:'Noa Vega',skill:'Stagehand'},{id:4,name:'Leo Torres',skill:'Video'}],
- events:[{id:1,name:'Aurora Music Festival',date:'2026-11-06',venue:'North Hall (fictional)',type:'Concert'},{id:2,name:'Beyond the Curtain',date:'2026-11-14',venue:'Central Theatre (fictional)',type:'Theatre'},{id:3,name:'Prisma Conference',date:'2026-11-20',venue:'Agora Centre (fictional)',type:'Corporate'}],
- jobs:[{id:1,eventId:1,workerId:1,role:'FOH',hours:9,rate:17,paid:70},{id:2,eventId:1,workerId:2,role:'Lights',hours:8,rate:17,paid:0},{id:3,eventId:2,workerId:3,role:'Stage crew',hours:7,rate:15,paid:105}],
- history:[{date:'2026-10-17',action:'Demo loaded with fictional data'}]
-});
-let db;try{db=JSON.parse(localStorage.getItem(STORAGE));if(!db||!Array.isArray(db.workers)||!Array.isArray(db.events)||!Array.isArray(db.jobs))throw Error()}catch(_){db=initial()}
-let tab='dashboard',dialog=null;
-const el=document.getElementById('app');
-const safe=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=n=>Number(n||0).toLocaleString('en-GB',{style:'currency',currency:'EUR'});
-const worker=id=>db.workers.find(x=>x.id===Number(id));
-const eventById=id=>db.events.find(x=>x.id===Number(id));
-const earned=j=>Number(j.hours)*Number(j.rate);
-const nextId=arr=>Math.max(0,...arr.map(x=>x.id))+1;
-const b=(text,call,extra='')=>'<button class="btn '+extra+'" onclick="'+call+'">'+text+'</button>';
-function persist(note){db.history.unshift({date:new Date().toISOString().slice(0,10),action:note});db.history=db.history.slice(0,40);localStorage.setItem(STORAGE,JSON.stringify(db));draw()}
-function heading(name,description,action=''){return '<div class="head"><div><h1>'+name+'</h1><p class="muted">'+description+'</p></div>'+action+'</div>'}
-function dashboard(){let total=db.jobs.reduce((n,j)=>n+earned(j),0),paid=db.jobs.reduce((n,j)=>n+Number(j.paid),0);
-return heading('Dashboard','Event and workforce overview · fictional sample data')+
-'<div class="kpis">'+[['Events',db.events.length],['Workers',db.workers.length],['Total compensation',money(total)],['Outstanding',money(total-paid)]].map(x=>'<div class="kpi"><span class="muted">'+x[0]+'</span><b>'+x[1]+'</b></div>').join('')+'</div>'+
-'<div class="cols"><section class="panel"><h2>Upcoming events</h2>'+db.events.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(x=>'<p><b>'+safe(x.name)+'</b><br><span class="muted">'+safe(x.date)+' · '+safe(x.venue)+'</span></p>').join('')+'</section><section class="panel"><h2>Open balances</h2>'+db.jobs.filter(j=>earned(j)>j.paid).map(j=>'<p><b>'+safe(worker(j.workerId)?.name||'Unknown')+'</b> — '+safe(eventById(j.eventId)?.name||'Unknown')+'<br><span class="muted">'+money(earned(j)-j.paid)+' remaining</span></p>').join('')+'</section></div>'}
-function events(){return heading('Events','Schedule and manage fictitious productions',b('+ New event',"openDialog('event')"))+
-'<section class="panel table"><table><thead><tr><th>Event</th><th>Date</th><th>Venue</th><th>Type</th><th>Workers</th><th>Actions</th></tr></thead><tbody>'+
-db.events.map(e=>'<tr><td><b>'+safe(e.name)+'</b></td><td>'+safe(e.date)+'</td><td>'+safe(e.venue)+'</td><td>'+safe(e.type)+'</td><td>'+db.jobs.filter(j=>j.eventId===e.id).length+'</td><td>'+b('Edit',"openDialog('event',"+e.id+")",'small alt')+' '+b('Delete',"removeEvent("+e.id+")",'small alt')+'</td></tr>').join('')+'</tbody></table></section>'}
-function workers(){return heading('Workers','Invented identities, no employee records',b('+ New worker',"openDialog('worker')"))+
-'<section class="panel table"><table><thead><tr><th>Name</th><th>Specialty</th><th>Actions</th></tr></thead><tbody>'+
-db.workers.map(w=>'<tr><td>'+safe(w.name)+'</td><td>'+safe(w.skill)+'</td><td>'+b('Edit',"openDialog('worker',"+w.id+")",'small alt')+'</td></tr>').join('')+'</tbody></table></section>'}
-function jobs(){let total=db.jobs.reduce((n,j)=>n+earned(j),0),paid=db.jobs.reduce((n,j)=>n+Number(j.paid),0);
-return heading('Assignments & payments','Simulated wages; no real transactions',b('+ Assign worker',"openDialog('job')"))+
-'<div class="kpis">'+[['Assignments',db.jobs.length],['Total',money(total)],['Simulated paid',money(paid)],['Outstanding',money(total-paid)]].map(x=>'<div class="kpi"><span class="muted">'+x[0]+'</span><b>'+x[1]+'</b></div>').join('')+'</div>'+
-'<section class="panel table"><table><thead><tr><th>Worker</th><th>Event</th><th>Role</th><th>Hours × Rate</th><th>Due</th><th>Paid</th><th>Actions</th></tr></thead><tbody>'+
-db.jobs.map(j=>'<tr><td>'+safe(worker(j.workerId)?.name||'Unknown')+'</td><td>'+safe(eventById(j.eventId)?.name||'Unknown')+'</td><td>'+safe(j.role)+'</td><td>'+safe(j.hours)+' × '+money(j.rate)+'</td><td>'+money(earned(j))+'</td><td>'+money(j.paid)+'</td><td>'+b('Pay',"openDialog('pay',"+j.id+")",'small alt')+' '+b('Remove',"removeJob("+j.id+")",'small alt')+'</td></tr>').join('')+'</tbody></table></section>'}
-function calendar(){const year=2026,month=10;let offset=(new Date(year,month,1).getDay()+6)%7, days=30;
-return heading('Calendar','November 2026 · sample schedule')+'<section class="panel"><div class="cal">'+['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>'<b>'+d+'</b>').join('')+Array.from({length:offset},()=>'<div></div>').join('')+Array.from({length:days},(_,i)=>{const date='2026-11-'+String(i+1).padStart(2,'0');return '<div class="day">'+(i+1)+db.events.filter(e=>e.date===date).map(e=>'<span class="tag">'+safe(e.name)+'</span>').join('')+'</div>'}).join('')+'</div></section>'}
-function history(){return heading('Activity log','Changes made locally in this visitor’s browser')+'<section class="panel"><p class="notice">This is not connected to any company system.</p><table><thead><tr><th>Date</th><th>Activity</th></tr></thead><tbody>'+db.history.map(h=>'<tr><td>'+safe(h.date)+'</td><td>'+safe(h.action)+'</td></tr>').join('')+'</tbody></table></section>'}
-function field(name,label,value='',type='text'){return '<label>'+label+'<input required name="'+name+'" type="'+type+'" '+(type==='number'?'min="0" step="any"':'')+' value="'+safe(value)+'"></label>'}
-function option(name,label,list,value){return '<label>'+label+'<select name="'+name+'">'+list.map(i=>'<option value="'+safe(i[0])+'" '+(String(i[0])===String(value)?'selected':'')+'>'+safe(i[1])+'</option>').join('')+'</select></label>'}
-function popup(){if(!dialog)return '';let {kind,id}=dialog, title='',body='';
-if(kind==='event'){let e=eventById(id)||{};title=id?'Edit event':'New event';body=field('name','Event name',e.name)+field('date','Date',e.date||'2026-11-22','date')+field('venue','Fictional venue',e.venue)+option('type','Type',['Concert','Theatre','Corporate','Festival','Other'].map(x=>[x,x]),e.type||'Concert')}
-if(kind==='worker'){let w=worker(id)||{};title=id?'Edit worker':'New worker';body=field('name','Fictional name',w.name)+field('skill','Specialty',w.skill)}
-if(kind==='job'){title='Assign worker';body=option('workerId','Worker',db.workers.map(w=>[w.id,w.name]))+option('eventId','Event',db.events.map(e=>[e.id,e.name]))+field('role','Role','Audio')+field('hours','Hours',8,'number')+field('rate','Rate (€ / hour)',16,'number')}
-if(kind==='pay'){let j=db.jobs.find(x=>x.id===id);title='Record simulated payment';body='<p class="muted">Outstanding: '+money(earned(j)-j.paid)+'</p>'+field('amount','Payment amount (€)',earned(j)-j.paid,'number')}
-return '<div class="modalback"><div class="modal" role="dialog" aria-modal="true"><h2>'+title+'</h2><form id="entry"><div>'+body+'</div><div class="actions"><button class="btn" type="submit">Save</button>'+b('Cancel','closeDialog()','alt')+'</div></form><p class="muted">Changes are only saved in this browser.</p></div></div>'}
-function draw(){
- const nav=[['dashboard','Dashboard'],['events','Events'],['workers','Workers'],['jobs','Assignments & payments'],['calendar','Calendar'],['history','Activity log']];
- const navHtml=nav.map(n=>'<button class="'+(tab===n[0]?'active':'')+'" data-tab="'+n[0]+'">'+n[1]+'</button>').join('');
- const view=({dashboard,events,workers,jobs,calendar,history})[tab]();
- el.innerHTML='<aside class="sidebar"><div class="brand"><span>Event</span>Flow</div><nav class="nav">'+navHtml+'</nav><div class="foot">PUBLIC PORTFOLIO DEMO<br>Fictional data only<br><br>'+b('Reset demo','resetDemo()','small alt')+'</div></aside>'+
- '<main class="main"><span class="banner">DEMO MODE · NO REAL COMPANY DATA</span>'+view+
- '<footer>EventFlow · Isolated, browser-only portfolio example. No backend, login or external data connections.</footer></main>'+popup();
- el.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>navigate(button.dataset.tab)));
- let form=document.getElementById('entry');
- if(form)form.addEventListener('submit',submit);
-}
-function navigate(to){tab=to;dialog=null;draw()}
-function openDialog(kind,id){dialog={kind,id};draw()}
-function closeDialog(){dialog=null;draw()}
-function submit(e){e.preventDefault();let values=Object.fromEntries(new FormData(e.target)), {kind,id}=dialog;
-if(kind==='event'){let data={name:values.name.trim(),date:values.date,venue:values.venue.trim(),type:values.type};if(id)Object.assign(eventById(id),data);else db.events.push({id:nextId(db.events),...data})}
-if(kind==='worker'){let data={name:values.name.trim(),skill:values.skill.trim()};if(id)Object.assign(worker(id),data);else db.workers.push({id:nextId(db.workers),...data})}
-if(kind==='job'){if(!db.workers.length||!db.events.length)return;db.jobs.push({id:nextId(db.jobs),workerId:+values.workerId,eventId:+values.eventId,role:values.role.trim(),hours:+values.hours,rate:+values.rate,paid:0})}
-if(kind==='pay'){let j=db.jobs.find(x=>x.id===id),amount=Number(values.amount);if(!Number.isFinite(amount)||amount<=0||amount>earned(j)-j.paid){alert('Enter a positive amount within the outstanding balance.');return}j.paid=Math.round((j.paid+amount)*100)/100}
-dialog=null;persist('Demo '+kind+' updated')}
-function removeEvent(id){if(!confirm('Delete this fictional event and its assignments?'))return;db.events=db.events.filter(e=>e.id!==id);db.jobs=db.jobs.filter(j=>j.eventId!==id);persist('Fictional event deleted')}
-function removeJob(id){if(!confirm('Remove this fictional assignment?'))return;db.jobs=db.jobs.filter(j=>j.id!==id);persist('Fictional assignment removed')}
-function resetDemo(){if(!confirm('Reset all fictional demo data?'))return;db=initial();localStorage.removeItem(STORAGE);navigate('dashboard')}
-window.openDialog = openDialog;
-window.closeDialog = closeDialog;
-window.removeEvent = removeEvent;
-window.removeJob = removeJob;
-window.resetDemo = resetDemo;
-window.navigate = navigate;
-// The application initialises only after the callbacks are installed.
-draw();
-} catch (error) {
-  const root = document.getElementById('app');
-  if (root) root.innerHTML = '<main style="max-width:800px;margin:40px auto;padding:25px;background:white;border-radius:12px"><h1>EventFlow — startup error</h1><p>The application could not initialize.</p><pre style="white-space:pre-wrap;color:#9d1b28"></pre></main>';
-  if (root) root.querySelector('pre').textContent = String(error && error.message || error);
-  console.error("EventFlow initialization error:",error);
-}
-</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#090d19">
+  <meta name="description" content="EventFlow Studio is an interactive, safe portfolio demonstration of fictional event planning, crew coordination, and financial reporting.">
+  <title>EventFlow Studio — Live Production Management Demo</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./studio.css?build=20261017-2">
+  <style>
+    html,body{min-height:100%;margin:0;background:#090d19;color:#f2f5ff;font-family:system-ui,sans-serif}
+    #boot{max-width:480px;margin:17vh auto;padding:30px;text-align:center}
+    #boot strong{font-size:27px;letter-spacing:-.8px}
+    #boot strong span{color:#fc746e}
+    #boot p{color:#98a6bc;font-size:13px;line-height:1.7}
+    .boot-orb{height:44px;width:44px;margin:0 auto 19px;background:linear-gradient(130deg,#fc8a75,#ef5267);border-radius:13px;box-shadow:0 0 40px #f35a6a44}
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="boot">
+      <div class="boot-orb"></div>
+      <strong>Event<span>Flow</span> Studio</strong>
+      <p>Launching your interactive production workspace…</p>
+      <p>Public portfolio demo · Fictional data only · No company connections</p>
+    </div>
+  </div>
+  <noscript><p style="text-align:center">JavaScript is required for this interactive demonstration.</p></noscript>
+  <script src="./studio.js?build=20261017-2" defer></script>
+  <script>
+    window.addEventListener('load', function () {
+      if (window.__eventflowReady) return;
+      var boot = document.getElementById('boot');
+      if (boot) boot.innerHTML =
+        '<strong>Event<span>Flow</span> Studio</strong>' +
+        '<p>We could not start the interactive demo. Try a hard refresh (Ctrl + F5). If it still fails, check whether studio.js was blocked in the browser console.</p>' +
+        '<p><a href="https://github.com/vicentektek/eventflow-demo" style="color:#ff9d92">View source on GitHub</a></p>';
+    });
+  </script>
+</body>
+</html>
