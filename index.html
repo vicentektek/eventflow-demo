@@ -73,6 +73,13 @@ dialog=null;persist('Demo '+kind+' updated')}
 function removeEvent(id){if(!confirm('Delete this fictional event and its assignments?'))return;db.events=db.events.filter(e=>e.id!==id);db.jobs=db.jobs.filter(j=>j.eventId!==id);persist('Fictional event deleted')}
 function removeJob(id){if(!confirm('Remove this fictional assignment?'))return;db.jobs=db.jobs.filter(j=>j.id!==id);persist('Fictional assignment removed')}
 function resetDemo(){if(!confirm('Reset all fictional demo data?'))return;db=initial();localStorage.removeItem(STORAGE);navigate('dashboard')}
+window.openDialog = openDialog;
+window.closeDialog = closeDialog;
+window.removeEvent = removeEvent;
+window.removeJob = removeJob;
+window.resetDemo = resetDemo;
+window.navigate = navigate;
+// The application initialises only after the callbacks are installed.
 draw();
 } catch (error) {
   const root = document.getElementById('app');
