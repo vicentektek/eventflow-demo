@@ -45,10 +45,17 @@ if(kind==='worker'){let w=worker(id)||{};title=id?'Edit worker':'New worker';bod
 if(kind==='job'){title='Assign worker';body=option('workerId','Worker',db.workers.map(w=>[w.id,w.name]))+option('eventId','Event',db.events.map(e=>[e.id,e.name]))+field('role','Role','Audio')+field('hours','Hours',8,'number')+field('rate','Rate (€ / hour)',16,'number')}
 if(kind==='pay'){let j=db.jobs.find(x=>x.id===id);title='Record simulated payment';body='<p class="muted">Outstanding: '+money(earned(j)-j.paid)+'</p>'+field('amount','Payment amount (€)',earned(j)-j.paid,'number')}
 return '<div class="modalback"><div class="modal" role="dialog" aria-modal="true"><h2>'+title+'</h2><form id="entry"><div>'+body+'</div><div class="actions"><button class="btn" type="submit">Save</button>'+b('Cancel','closeDialog()','alt')+'</div></form><p class="muted">Changes are only saved in this browser.</p></div></div>'}
-function draw(){let nav=[['dashboard','Dashboard'],['events','Events'],['workers','Workers'],['jobs','Assignments & payments'],['calendar','Calendar'],['history','Activity log']];
-el.innerHTML='<aside class="sidebar"><div class="brand"><span>Event</span>Flow</div><nav class="nav">'+nav.map(n=>'<button class="'+(tab===n[0]?'active':'')+'" onclick="navigate('"+n[0]+"')">'+n[1]+'</button>').join('')+'</nav><div class="foot">PUBLIC PORTFOLIO DEMO<br>Fictional data only<br><br>'+b('Reset demo','resetDemo()','small alt')+'</div></aside>'+
-'<main class="main"><span class="banner">DEMO MODE · NO REAL COMPANY DATA</span>'+({dashboard,events,workers,jobs,calendar,history})[tab]()+ '<footer>EventFlow · Isolated, browser-only portfolio example. No backend, login or external data connections.</footer></main>'+popup();
-let f=document.getElementById('entry');if(f)f.addEventListener('submit',submit)}
+function draw(){
+ const nav=[['dashboard','Dashboard'],['events','Events'],['workers','Workers'],['jobs','Assignments & payments'],['calendar','Calendar'],['history','Activity log']];
+ const navHtml=nav.map(n=>'<button class="'+(tab===n[0]?'active':'')+'" data-tab="'+n[0]+'">'+n[1]+'</button>').join('');
+ const view=({dashboard,events,workers,jobs,calendar,history})[tab]();
+ el.innerHTML='<aside class="sidebar"><div class="brand"><span>Event</span>Flow</div><nav class="nav">'+navHtml+'</nav><div class="foot">PUBLIC PORTFOLIO DEMO<br>Fictional data only<br><br>'+b('Reset demo','resetDemo()','small alt')+'</div></aside>'+
+ '<main class="main"><span class="banner">DEMO MODE · NO REAL COMPANY DATA</span>'+view+
+ '<footer>EventFlow · Isolated, browser-only portfolio example. No backend, login or external data connections.</footer></main>'+popup();
+ el.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>navigate(button.dataset.tab)));
+ let form=document.getElementById('entry');
+ if(form)form.addEventListener('submit',submit);
+}
 function navigate(to){tab=to;dialog=null;draw()}
 function openDialog(kind,id){dialog={kind,id};draw()}
 function closeDialog(){dialog=null;draw()}
